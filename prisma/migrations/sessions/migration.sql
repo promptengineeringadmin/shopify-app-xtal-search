@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "Session" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "shop" TEXT NOT NULL,
@@ -8,6 +7,7 @@ CREATE TABLE "Session" (
     "expires" DATETIME,
     "accessToken" TEXT NOT NULL,
     "userId" BIGINT,
+    "scriptTagId" BIGINT,
     "firstName" TEXT,
     "lastName" TEXT,
     "email" TEXT,

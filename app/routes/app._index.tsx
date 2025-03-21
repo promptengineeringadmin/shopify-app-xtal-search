@@ -11,6 +11,7 @@ import {
   Box,
   List,
   Link,
+  Spinner,
   InlineStack,
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
@@ -18,7 +19,7 @@ import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-
+  console.log(`authenticate`,authenticate);
   return null;
 };
 
@@ -112,16 +113,14 @@ export default function Index() {
 
   return (
     <Page>
-      <TitleBar title="Remix app template">
-        <button variant="primary" onClick={generateProduct}>
-          Generate a product
-        </button>
+      <TitleBar title="XTAL - AI Search">
       </TitleBar>
       <BlockStack gap="500">
         <Layout>
           <Layout.Section>
             <Card>
               <BlockStack gap="500">
+                {/*
                 <BlockStack gap="200">
                   <Text as="h2" variant="headingMd">
                     Congrats on creating a new Shopify app 🎉
@@ -151,26 +150,18 @@ export default function Index() {
                     development.
                   </Text>
                 </BlockStack>
+                */}
                 <BlockStack gap="200">
                   <Text as="h3" variant="headingMd">
                     Get started with products
                   </Text>
                   <Text as="p" variant="bodyMd">
-                    Generate a product with GraphQL and get the JSON output for
-                    that product. Learn more about the{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql/latest/mutations/productCreate"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      productCreate
-                    </Link>{" "}
-                    mutation in our API references.
+                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Error, harum ab. Explicabo doloribus, quibusdam in laboriosam tenetur sequi aliquam suscipit officiis alias? Debitis velit illum esse quasi nulla maxime laudantium!
                   </Text>
                 </BlockStack>
                 <InlineStack gap="300">
                   <Button loading={isLoading} onClick={generateProduct}>
-                    Generate a product
+                    Start Install Process
                   </Button>
                   {fetcher.data?.product && (
                     <Button
@@ -182,6 +173,7 @@ export default function Index() {
                     </Button>
                   )}
                 </InlineStack>
+                <Spinner accessibilityLabel="Spinner example" size="large" />
                 {fetcher.data?.product && (
                   <>
                     <Text as="h3" variant="headingMd">
@@ -225,6 +217,7 @@ export default function Index() {
               </BlockStack>
             </Card>
           </Layout.Section>
+          {/*
           <Layout.Section variant="oneThird">
             <BlockStack gap="500">
               <Card>
@@ -327,6 +320,7 @@ export default function Index() {
               </Card>
             </BlockStack>
           </Layout.Section>
+          */}
         </Layout>
       </BlockStack>
     </Page>
