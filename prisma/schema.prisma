@@ -36,3 +36,9 @@ model Products {
   id            String    @id
   shop          String
 }
+
+model SyncLogs {
+  id    String  @id @default(uuid())
+  shop  String
+  date  DateTime @default(now())
+}

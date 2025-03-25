@@ -1,3 +1,89 @@
+<div class="search-container-wrap">
+  <search-page>
+    <div class="search-container">
+        <input type="text" class="search-input" placeholder="Search..." />
+        <button class="search-button">Search</button>
+    </div>
+    <div class="results-container"></div>
+  </search-page>
+
+</div>
+
+<style>
+  search-page {
+    display: flex;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    flex-direction: column;
+    align-items: center;
+  }
+  .search-container {
+    display: flex;
+    gap: 10px;
+    max-width: 600px;
+    width: 100%;
+  }
+  .search-input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .search-button {
+    padding: 8px 12px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  .results-container {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .search-result-card {
+    display: flex;
+  }
+
+  a.search-link {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  a.search-link h3 {
+    display: flex;
+    width: 100%;
+  }
+
+  .search-item-img-frame{
+    display: flex;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1;
+  }
+
+  .search-item-img {
+    position: absolute;
+    width: 100%;
+  }
+
+  .search-result{
+    display: flex;
+  }
+  .search-link{
+    display: flex;
+    flex-direction: column;
+  }
+
+</style>
+
 {% schema %}
 {
   "name": "XTAL Search",

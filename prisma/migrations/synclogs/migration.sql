@@ -1,0 +1,5 @@
+CREATE TABLE "SyncLogs" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "shop" TEXT NOT NULL,
+    "date" DATETIME NOT NULL
+);

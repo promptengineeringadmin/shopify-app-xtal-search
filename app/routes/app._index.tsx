@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
-import { useFetcher } from "@remix-run/react";
+import { useFetcher, useLoaderData } from "@remix-run/react";
 import {
   Page,
   Layout,
@@ -8,108 +8,61 @@ import {
   Card,
   Button,
   BlockStack,
-  Box,
-  List,
-  Link,
+  Thumbnail,
   Spinner,
-  InlineStack,
+  Popover,
 } from "@shopify/polaris";
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
-import { authenticate } from "../shopify.server";
+import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
+import { authenticate, db } from "../shopify.server";
+import { fetchAndSendProducts  } from "../utils/shopifyProducts";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
-  console.log(`authenticate`,authenticate);
-  return null;
+  const syncLogs = await db.SyncLogs.findMany({
+    orderBy: { date: "asc" },
+    take: 3,
+  });
+  return { syncLogs };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
-  const color = ["Red", "Orange", "Yellow", "Green"][
-    Math.floor(Math.random() * 4)
-  ];
-  const response = await admin.graphql(
-    `#graphql
-      mutation populateProduct($product: ProductCreateInput!) {
-        productCreate(product: $product) {
-          product {
-            id
-            title
-            handle
-            status
-            variants(first: 10) {
-              edges {
-                node {
-                  id
-                  price
-                  barcode
-                  createdAt
-                }
-              }
-            }
-          }
-        }
-      }`,
-    {
-      variables: {
-        product: {
-          title: `${color} Snowboard`,
-        },
-      },
-    },
-  );
-  const responseJson = await response.json();
-
-  const product = responseJson.data!.productCreate!.product!;
-  const variantId = product.variants.edges[0]!.node!.id!;
-
-  const variantResponse = await admin.graphql(
-    `#graphql
-    mutation shopifyRemixTemplateUpdateVariant($productId: ID!, $variants: [ProductVariantsBulkInput!]!) {
-      productVariantsBulkUpdate(productId: $productId, variants: $variants) {
-        productVariants {
-          id
-          price
-          barcode
-          createdAt
-        }
-      }
-    }`,
-    {
-      variables: {
-        productId: product.id,
-        variants: [{ id: variantId, price: "100.00" }],
-      },
-    },
-  );
-
-  const variantResponseJson = await variantResponse.json();
-
-  return {
-    product: responseJson!.data!.productCreate!.product,
-    variant:
-      variantResponseJson!.data!.productVariantsBulkUpdate!.productVariants,
-  };
+  console.log(`admin`,admin);  
+  const fetchProductsResponse = await fetchAndSendProducts(request);
+  console.log(`\n\n\nAll Products sent successfully!`);
+  return { products: fetchProductsResponse };
 };
 
-export default function Index() {
-  const fetcher = useFetcher<typeof action>();
 
+export default function Index() {   
   const shopify = useAppBridge();
-  const isLoading =
-    ["loading", "submitting"].includes(fetcher.state) &&
-    fetcher.formMethod === "POST";
-  const productId = fetcher.data?.product?.id.replace(
-    "gid://shopify/Product/",
-    "",
-  );
+  const fetcher = useFetcher<typeof action>();
+  const [isLoading, setLoaded] = useState(false)
+  const { syncLogs } = useLoaderData<typeof loader>() || { syncLogs: [] };
 
   useEffect(() => {
-    if (productId) {
-      shopify.toast.show("Product created");
+    console.log(`fetcher.state`,fetcher.state);
+
+    if( fetcher.state === 'submitting' ){
+      shopify.loading(true);
+      shopify.modal.show('my-modal')
+      setLoaded(true);
     }
-  }, [productId, shopify]);
-  const generateProduct = () => fetcher.submit({}, { method: "POST" });
+    if( fetcher.state === 'loading'){
+      shopify.loading(false);
+      setLoaded(false);
+    }
+  }, [fetcher]);
+
+  const styles = {
+    spinnerContainer: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      minHeight: '150px',
+    },
+  };
 
   return (
     <Page>
@@ -120,209 +73,75 @@ export default function Index() {
           <Layout.Section>
             <Card>
               <BlockStack gap="500">
-                {/*
-                <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Congrats on creating a new Shopify app 🎉
-                  </Text>
-                  <Text variant="bodyMd" as="p">
-                    This embedded app template uses{" "}
-                    <Link
-                      url="https://shopify.dev/docs/apps/tools/app-bridge"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      App Bridge
-                    </Link>{" "}
-                    interface examples like an{" "}
-                    <Link url="/app/additional" removeUnderline>
-                      additional page in the app nav
-                    </Link>
-                    , as well as an{" "}
-                    <Link
-                      url="https://shopify.dev/docs/api/admin-graphql"
-                      target="_blank"
-                      removeUnderline
-                    >
-                      Admin GraphQL
-                    </Link>{" "}
-                    mutation demo, to provide a starting point for app
-                    development.
-                  </Text>
-                </BlockStack>
-                */}
                 <BlockStack gap="200">
                   <Text as="h3" variant="headingMd">
                     Get started with products
                   </Text>
                   <Text as="p" variant="bodyMd">
                     Lorem ipsum dolor, sit amet consectetur adipisicing elit. Error, harum ab. Explicabo doloribus, quibusdam in laboriosam tenetur sequi aliquam suscipit officiis alias? Debitis velit illum esse quasi nulla maxime laudantium!
-                  </Text>
+                  </Text>                  
+                  <Thumbnail
+                    source="/banner.avif"
+                    size="large"
+                    alt="Black choker necklace"
+                  />
                 </BlockStack>
-                <InlineStack gap="300">
-                  <Button loading={isLoading} onClick={generateProduct}>
-                    Start Install Process
-                  </Button>
-                  {fetcher.data?.product && (
-                    <Button
-                      url={`shopify:admin/products/${productId}`}
-                      target="_blank"
-                      variant="plain"
-                    >
-                      View product
-                    </Button>
-                  )}
-                </InlineStack>
-                <Spinner accessibilityLabel="Spinner example" size="large" />
-                {fetcher.data?.product && (
-                  <>
-                    <Text as="h3" variant="headingMd">
-                      {" "}
-                      productCreate mutation
-                    </Text>
-                    <Box
-                      padding="400"
-                      background="bg-surface-active"
-                      borderWidth="025"
-                      borderRadius="200"
-                      borderColor="border"
-                      overflowX="scroll"
-                    >
-                      <pre style={{ margin: 0 }}>
-                        <code>
-                          {JSON.stringify(fetcher.data.product, null, 2)}
-                        </code>
-                      </pre>
-                    </Box>
-                    <Text as="h3" variant="headingMd">
-                      {" "}
-                      productVariantsBulkUpdate mutation
-                    </Text>
-                    <Box
-                      padding="400"
-                      background="bg-surface-active"
-                      borderWidth="025"
-                      borderRadius="200"
-                      borderColor="border"
-                      overflowX="scroll"
-                    >
-                      <pre style={{ margin: 0 }}>
-                        <code>
-                          {JSON.stringify(fetcher.data.variant, null, 2)}
-                        </code>
-                      </pre>
-                    </Box>
-                  </>
-                )}
               </BlockStack>
             </Card>
           </Layout.Section>
-          {/*
           <Layout.Section variant="oneThird">
             <BlockStack gap="500">
               <Card>
+                <BlockStack gap="500">
+                <Text as="h3" variant="headingMd">
+                  Sync Logs
+                </Text>
                 <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    App template specs
-                  </Text>
-                  <BlockStack gap="200">
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Framework
+                  {syncLogs.length > 0 ? (
+                    syncLogs.map((log) => (
+                      <Text key={log.id} as="p" variant="bodyMd">
+                        <strong>Succeed Sync At: </strong> {new Date(log.date).toLocaleString()}
                       </Text>
-                      <Link
-                        url="https://remix.run"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        Remix
-                      </Link>
-                    </InlineStack>
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Database
-                      </Text>
-                      <Link
-                        url="https://www.prisma.io/"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        Prisma
-                      </Link>
-                    </InlineStack>
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        Interface
-                      </Text>
-                      <span>
-                        <Link
-                          url="https://polaris.shopify.com"
-                          target="_blank"
-                          removeUnderline
-                        >
-                          Polaris
-                        </Link>
-                        {", "}
-                        <Link
-                          url="https://shopify.dev/docs/apps/tools/app-bridge"
-                          target="_blank"
-                          removeUnderline
-                        >
-                          App Bridge
-                        </Link>
-                      </span>
-                    </InlineStack>
-                    <InlineStack align="space-between">
-                      <Text as="span" variant="bodyMd">
-                        API
-                      </Text>
-                      <Link
-                        url="https://shopify.dev/docs/api/admin-graphql"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        GraphQL API
-                      </Link>
-                    </InlineStack>
-                  </BlockStack>
+                    ))
+                  ) : (
+                    <Text as="p">No sync logs available.</Text>
+                  )}
                 </BlockStack>
-              </Card>
-              <Card>
                 <BlockStack gap="200">
-                  <Text as="h2" variant="headingMd">
-                    Next steps
-                  </Text>
-                  <List>
-                    <List.Item>
-                      Build an{" "}
-                      <Link
-                        url="https://shopify.dev/docs/apps/getting-started/build-app-example"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        {" "}
-                        example app
-                      </Link>{" "}
-                      to get started
-                    </List.Item>
-                    <List.Item>
-                      Explore Shopify’s API with{" "}
-                      <Link
-                        url="https://shopify.dev/docs/apps/tools/graphiql-admin-api"
-                        target="_blank"
-                        removeUnderline
-                      >
-                        GraphiQL
-                      </Link>
-                    </List.Item>
-                  </List>
+                <fetcher.Form method="post">
+                  {isLoading ? (
+                    <Spinner accessibilityLabel="Sending products" size="large" />
+                  ) : (
+                    <>
+                      <input type="hidden" name="actionType" value="sendProducts" />
+                      <Button submit>
+                        {syncLogs.length > 0 ? (
+                          'New Sync'
+                        ) : (
+                          'Send Products to External Provider'
+                        )}                        
+                      </Button>
+                    </>
+                  )}
+                </fetcher.Form>
                 </BlockStack>
-              </Card>
+              </BlockStack>
+              </Card>              
             </BlockStack>
           </Layout.Section>
-          */}
         </Layout>
       </BlockStack>
+      <Modal id="my-modal" variant="large">
+        <div style={styles.spinnerContainer}>
+          {isLoading ? (
+            <Spinner size="large" />
+          ) : (
+            <Text as="b">Products Sent!</Text>
+          )}
+        </div>
+        <TitleBar title="Sending Products">
+        </TitleBar>
+      </Modal>
     </Page>
   );
 }

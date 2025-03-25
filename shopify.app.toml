@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "1263649ff198679c47e5b946f813674e"
-application_url = "https://titans-forestry-usr-movements.trycloudflare.com"
+application_url = "https://live-banana-province-airplane.trycloudflare.com"
 embedded = true
 name = "Xtal Search"
 handle = "xtal-search-1"
@@ -35,9 +35,9 @@ scopes = "write_products,write_script_tags"
 
 [auth]
 redirect_urls = [
-  "https://titans-forestry-usr-movements.trycloudflare.com/auth/callback",
-  "https://titans-forestry-usr-movements.trycloudflare.com/auth/shopify/callback",
-  "https://titans-forestry-usr-movements.trycloudflare.com/api/auth/callback"
+  "https://live-banana-province-airplane.trycloudflare.com/auth/callback",
+  "https://live-banana-province-airplane.trycloudflare.com/auth/shopify/callback",
+  "https://live-banana-province-airplane.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
@@ -46,3 +46,4 @@ embedded = false
 [build]
 automatically_update_urls_on_dev = true
 include_config_on_deploy = true
+dev_store_url = "xteal-sandbox-store.myshopify.com"
