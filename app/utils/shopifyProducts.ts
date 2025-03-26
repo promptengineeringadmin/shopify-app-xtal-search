@@ -67,6 +67,7 @@ export function splitIntoChunks<T>(array: T[], chunkSize: number): T[][] {
 
 // Maps Shopify product to external provider format
 export function mapShopifyProduct(shopifyProduct: ShopifyProduct): ExternalProduct {
+  const itemPrice = Number(shopifyProduct.priceRange?.minVariantPrice?.amount).toFixed(2);
   return {
     product_id: shopifyProduct.id,
     name: shopifyProduct.title,
@@ -74,7 +75,7 @@ export function mapShopifyProduct(shopifyProduct: ShopifyProduct): ExternalProdu
     product_url: shopifyProduct.handle,
     image_url: shopifyProduct.featuredImage?.url || null,
     item_group_id: null,
-    price: shopifyProduct.priceRange?.minVariantPrice?.amount || null,
+    price: itemPrice || null,
     sale_price: null,
     category: shopifyProduct.productType,
     brand: shopifyProduct.vendor,
@@ -231,10 +232,11 @@ export async function fetchAndSendProducts(request: Request) {
     });
 
     console.log(`Products`);
-    console.log(JSON.stringify(mappedProducts));
+    console.log(JSON.stringify(mappedProducts[2]));
+    console.log(JSON.stringify(mappedProducts[3]));
     console.log(`\n\n`);
 
-    const externalResponse = await fetch("https://41de-187-161-119-1.ngrok-free.app/import", {
+    const externalResponse = await fetch("https://92da-187-161-119-1.ngrok-free.app/import", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,8 +1,12 @@
 <div class="search-container-wrap">
-  <search-page>
+  <search-page limit="{{ section.settings.max_products }}">
     <div class="search-container">
         <input type="text" class="search-input" placeholder="Search..." />
         <button class="search-button">Search</button>
+    </div>
+    <div class="aspects-containers">
+      <div id="active-aspects-container"></div>
+      <div id="aspects-container"></div>
     </div>
     <div class="results-container"></div>
   </search-page>
@@ -16,6 +20,7 @@
     font-family: Arial, sans-serif;
     flex-direction: column;
     align-items: center;
+    min-height: 100vh;
   }
   .search-container {
     display: flex;
@@ -23,6 +28,39 @@
     max-width: 600px;
     width: 100%;
   }
+  .aspects-containers {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+    margin: 1rem 0;
+    flex-direction: column;
+  }
+  #aspects-container, #active-aspects-container {
+    display: flex;
+    width: 100%;
+    gap: 1rem;
+  }
+  .aspects-containers label {
+    cursor: pointer;
+    border: 1px solid gray;
+    padding: .5rem 1rem;
+    border-radius: 1rem;
+    display: flex;
+    transition: all;
+    align-items: center;
+    max-height: fit-content;
+    min-width: fit-content;
+  }
+  .aspects-containers label:hover {
+    background-color: #80bbff;
+    color: #FFF;
+  }
+
+  #active-aspects-container label {
+    background-color: #0978f6;
+    color: #FFF;
+  }
+
   .search-input {
     flex-grow: 1;
     padding: 8px;
@@ -44,7 +82,7 @@
     border-radius: 4px;
     display: grid;
     gap: 1rem;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .search-result-card {
     display: flex;
@@ -54,11 +92,21 @@
     display: flex;
     flex-direction: column;
     width: 100%;
+    text-decoration: none;
+    padding: 1rem;
   }
 
   a.search-link h3 {
     display: flex;
     width: 100%;
+  }
+
+  a.search-link .search-item-price-container {
+    
+  }
+
+  a.search-link .search-item-price-container .search-item-price{
+    color: rgb(var(--color-foreground));
   }
 
   .search-item-img-frame{
@@ -88,7 +136,19 @@
 {
   "name": "XTAL Search",
   "target": "section",
-  "javascript": "app.js"
+  "javascript": "app.js",
+  "settings": [
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Max Products Per Page",
+      "min": 20,
+      "max": 50,
+      "step": 1,
+      "unit": "products",
+      "default": 25
+    }
+  ]
 }
 {% endschema %}
 
