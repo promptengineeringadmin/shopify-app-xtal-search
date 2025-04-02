@@ -54,7 +54,7 @@ class SearchPage extends HTMLElement {
       };
 
       fetch(
-        `https://92da-187-161-119-1.ngrok-free.app/get_aspects?query=${query}&aspects=${this.activeAspects.join(",")}`,
+        `https://84cf-187-161-119-1.ngrok-free.app/get_aspects?query=${query}&aspects=${this.activeAspects.join(",")}`,
         requestOptions,
       )
         .then((response) => response.json())
@@ -104,7 +104,7 @@ class SearchPage extends HTMLElement {
       redirect: "follow",
     };
 
-    fetch("https://92da-187-161-119-1.ngrok-free.app/search", requestOptions)
+    fetch("https://84cf-187-161-119-1.ngrok-free.app/search", requestOptions)
       .then((response) => response.json())
       .then((data) => {
         resultsContainer.innerHTML = "";

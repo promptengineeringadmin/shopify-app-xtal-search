@@ -236,7 +236,7 @@ export async function fetchAndSendProducts(request: Request) {
     console.log(JSON.stringify(mappedProducts[3]));
     console.log(`\n\n`);
 
-    const externalResponse = await fetch("https://92da-187-161-119-1.ngrok-free.app/import", {
+    const externalResponse = await fetch("https://84cf-187-161-119-1.ngrok-free.app/import", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
