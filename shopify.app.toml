@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "1263649ff198679c47e5b946f813674e"
-application_url = "https://baghdad-cologne-regulated-dts.trycloudflare.com"
+application_url = "https://shopify-app-xtal-search.onrender.com"
 embedded = true
 name = "Xtal Search"
 handle = "xtal-search-1"
@@ -35,9 +35,9 @@ scopes = "write_products,write_script_tags"
 
 [auth]
 redirect_urls = [
-  "https://baghdad-cologne-regulated-dts.trycloudflare.com/auth/callback",
-  "https://baghdad-cologne-regulated-dts.trycloudflare.com/auth/shopify/callback",
-  "https://baghdad-cologne-regulated-dts.trycloudflare.com/api/auth/callback"
+  "https://shopify-app-xtal-search.onrender.com/auth/callback",
+  "https://shopify-app-xtal-search.onrender.com/auth/shopify/callback",
+  "https://shopify-app-xtal-search.onrender.com/api/auth/callback"
 ]
 
 [pos]
