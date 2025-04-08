@@ -71,3 +71,26 @@
     padding-bottom: 1rem;
   }
 }
+
+
+.todoSection {
+  margin-top: 2rem;
+  padding: 1rem;
+  background: #f9f9f9;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.todoList {
+  list-style: none;
+  padding: 0;
+}
+
+.todoItem {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.todoItem input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
