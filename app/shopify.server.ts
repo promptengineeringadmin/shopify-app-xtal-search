@@ -4,8 +4,19 @@ import {
   AppDistribution,
   shopifyApp,
 } from "@shopify/shopify-app-remix/server";
-import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
+import { createClient} from 'redis';
+import { RedisSessionStorage } from '@shopify/shopify-app-session-storage-redis';
+
 import prisma from "./db.server";
+
+const redisClient = createClient({
+  username: 'default',
+  password: 'JhLVxVD0JxDSSHz4k966XsS0fmFLzaN1',
+  socket: {
+      host: 'redis-13127.c12.us-east-1-4.ec2.redns.redis-cloud.com',
+      port: 13127
+  }
+});
 
 const shopify = shopifyApp({
   apiKey: process.env.SHOPIFY_API_KEY,
@@ -14,7 +25,7 @@ const shopify = shopifyApp({
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",
   authPathPrefix: "/auth",
-  sessionStorage: new PrismaSessionStorage(prisma),
+  sessionStorage: new RedisSessionStorage(redisClient),
   distribution: AppDistribution.AppStore,
   future: {
     unstable_newEmbeddedAuthStrategy: true,

@@ -14,7 +14,7 @@ import {
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
 import { authenticate, db } from "../shopify.server";
-import { fetchAndSendProducts  } from "../utils/shopifyProducts";
+import { fetchAndQueueProducts  } from "../utils/shopifyProducts";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -28,7 +28,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
   console.log(`admin`,admin);  
-  const fetchProductsResponse = await fetchAndSendProducts(request);
+  const fetchProductsResponse = await fetchAndQueueProducts(request);
   console.log(`\n\n\nAll Products sent successfully!`);
   return { products: fetchProductsResponse };
 };

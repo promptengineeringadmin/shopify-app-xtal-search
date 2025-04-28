@@ -1,21 +1,22 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "1263649ff198679c47e5b946f813674e"
-application_url = "https://shopify-app-xtal-search.onrender.com"
-embedded = true
 name = "Xtal Search"
 handle = "xtal-search-1"
+application_url = "https://hotels-surfing-ss-und.trycloudflare.com"
+embedded = true
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "xteal-sandbox-store.myshopify.com"
+include_config_on_deploy = true
 
 [webhooks]
 api_version = "2025-01"
 
   [[webhooks.subscriptions]]
-  topics = [ "app/uninstalled" ]
-  uri = "/webhooks/uninstalled"
-
-  [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
-  uri = "/webhooks/scopes_update"
+  topics = [ "products/delete" ]
+  uri = "/webhooks/product/delete"
 
   [[webhooks.subscriptions]]
   topics = [ "products/create" ]
@@ -26,8 +27,12 @@ api_version = "2025-01"
   uri = "/webhooks/product/update"
 
   [[webhooks.subscriptions]]
-  topics = [ "products/delete" ]
-  uri = "/webhooks/product/delete"
+  topics = [ "app/scopes_update" ]
+  uri = "/webhooks/scopes_update"
+
+  [[webhooks.subscriptions]]
+  topics = [ "app/uninstalled" ]
+  uri = "/webhooks/uninstalled"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
@@ -35,15 +40,10 @@ scopes = "write_products,write_script_tags"
 
 [auth]
 redirect_urls = [
-  "https://shopify-app-xtal-search.onrender.com/auth/callback",
-  "https://shopify-app-xtal-search.onrender.com/auth/shopify/callback",
-  "https://shopify-app-xtal-search.onrender.com/api/auth/callback"
+  "https://hotels-surfing-ss-und.trycloudflare.com/auth/callback",
+  "https://hotels-surfing-ss-und.trycloudflare.com/auth/shopify/callback",
+  "https://hotels-surfing-ss-und.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]
 embedded = false
-
-[build]
-automatically_update_urls_on_dev = true
-include_config_on_deploy = true
-dev_store_url = "xteal-sandbox-store.myshopify.com"

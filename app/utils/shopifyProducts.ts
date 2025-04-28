@@ -1,5 +1,6 @@
 import { authenticate, db } from "../shopify.server";
-//import { productQueue } from "./queue";
+import { from, EMPTY } from 'rxjs';
+import { expand, mergeMap, tap } from 'rxjs/operators';
 
 // Define types for Shopify product and response
 interface ShopifyProduct {
@@ -93,14 +94,10 @@ export function mapShopifyProducts(shopifyResponse: ShopifyProduct[]): ExternalP
 // Fetch products from Shopify and send them to an external provider
 export async function fetchAndQueueProducts(request: Request) {
   const { admin } = await authenticate.admin(request);
-  let cursor: string | null = null;
-  let hasNextPage = true;
-
   console.log(`\n\nFetching and sending products.`);
-
   try {
-    // Loop through paginated results
-    while (hasNextPage) {
+    // Fetch function
+    async function fetchProducts(cursor: string | null) {
       const response: Response = await admin.graphql(
         `#graphql
         query getProducts($cursor: String) {
@@ -132,30 +129,45 @@ export async function fetchAndQueueProducts(request: Request) {
         { variables: { cursor } }
       );
 
-    await db.SyncLogs.create({
-      data: {
-        shop: 'prisma',
-        date: new Date(),
-      },
-    });
+      const responseJson = await response.json();
+      const products = responseJson?.data.products.edges.map(
+        (edge: { node: any }) => edge.node
+      );
 
-    const responseJson = await response.json();
-    const fetchedProducts = responseJson?.data.products.edges.map(
-      (edge: { node: any }) => edge.node
-    );
+      const nextCursor = responseJson.data.products.edges.length
+        ? responseJson.data.products.edges.slice(-1)[0].cursor
+        : null;
 
-    // Add each batch to the queue
-    await productQueue.add("sendProducts", { products: fetchedProducts });
+      const hasNextPage = responseJson.data.products.pageInfo.hasNextPage;
 
-    // Update cursor & check if more pages exist
-    cursor = responseJson.data.products.edges.length
-      ? responseJson.data.products.edges.slice(-1)[0].cursor
-      : null;
-    hasNextPage = responseJson.data.products.pageInfo.hasNextPage;
+      return { products, nextCursor, hasNextPage };
     }
 
-    console.log("All products added to the queue.");
-    return { success: true, message: "Products enqueued successfully" };
+    // Observable process
+    from(fetchProducts(null)).pipe(
+      expand(({ nextCursor, hasNextPage }) => {
+        if (!hasNextPage) return EMPTY; // No more pages -> complete Observable
+        return from(fetchProducts(nextCursor));
+      }),
+      tap(async ({ products }) => {
+        // Save sync log
+        await db.SyncLogs.create({
+          data: {
+            shop: 'prisma',
+            date: new Date(),
+          },
+        });
+
+        console.log('Fetched batch of products:', products.length);
+
+        // Here you can do more processing with "products" if needed
+      })
+    ).subscribe({
+      next: () => {},
+      error: (err) => console.error('Error fetching products:', err),
+      complete: () => console.log('Finished fetching all products!')
+    });
+    
   } catch (error) {
     console.error("Error in fetchAndQueueProducts:", error);
     return { success: false, error: error.message };
