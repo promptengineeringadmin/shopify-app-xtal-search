@@ -3,7 +3,7 @@
 client_id = "1263649ff198679c47e5b946f813674e"
 name = "Xtal Search"
 handle = "xtal-search-1"
-application_url = "https://hotels-surfing-ss-und.trycloudflare.com"
+application_url = "https://statute-ericsson-hormone-filed.trycloudflare.com"
 embedded = true
 
 [build]
@@ -40,9 +40,9 @@ scopes = "write_products,write_script_tags"
 
 [auth]
 redirect_urls = [
-  "https://hotels-surfing-ss-und.trycloudflare.com/auth/callback",
-  "https://hotels-surfing-ss-und.trycloudflare.com/auth/shopify/callback",
-  "https://hotels-surfing-ss-und.trycloudflare.com/api/auth/callback"
+  "https://statute-ericsson-hormone-filed.trycloudflare.com/auth/callback",
+  "https://statute-ericsson-hormone-filed.trycloudflare.com/auth/shopify/callback",
+  "https://statute-ericsson-hormone-filed.trycloudflare.com/api/auth/callback"
 ]
 
 [pos]

@@ -34,7 +34,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 
-export default function Index() {   
+export default function Index() {
   const shopify = useAppBridge();
   const fetcher = useFetcher<typeof action>();
   const [isLoading, setLoaded] = useState(false)
