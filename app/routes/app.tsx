@@ -24,7 +24,7 @@ export default function App() {
         <Link to="/app" rel="home">
           Home
         </Link>
-        <Link to="/app/additional">Additional page</Link>
+        <Link to="/app/additional">Dashboard</Link>
 
         <Link to="/app/search-performance">Search Performance</Link>
         <Link to="/app/prompt-controls">Prompt Controls</Link>

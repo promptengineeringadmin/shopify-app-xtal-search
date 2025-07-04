@@ -1,6 +1,6 @@
 import { authenticate, db } from "../shopify.server";
 import { from, EMPTY } from 'rxjs';
-import { expand, mergeMap, tap } from 'rxjs/operators';
+import { expand, tap } from 'rxjs/operators';
 
 // Define types for Shopify product and response
 interface ShopifyProduct {
@@ -167,10 +167,10 @@ export async function fetchAndQueueProducts(request: Request) {
       error: (err) => console.error('Error fetching products:', err),
       complete: () => console.log('Finished fetching all products!')
     });
-    
-  } catch (error) {
+
+  } catch (error: any) {
     console.error("Error in fetchAndQueueProducts:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error?.message ?? '' };
   }
 }
 
@@ -244,14 +244,27 @@ export async function fetchAndSendProducts(request: Request) {
     });
 
     console.log(`Products`);
-    console.log(JSON.stringify(mappedProducts[2]));
-    console.log(JSON.stringify(mappedProducts[3]));
+    console.log(JSON.stringify(mappedProducts));
     console.log(`\n\n`);
 
-    const externalResponse = await fetch("https://84cf-187-161-119-1.ngrok-free.app/import", {
+    const authentication = await fetch(
+      'https://us-east-21skawhkkr.auth.us-east-2.amazoncognito.com/oauth2/token',
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        method: 'POST',
+        body: `grant_type=client_credentials&client_id=4q786i1ngbjv7ogf1i5i6m2k20&client_secret=gqc44cg8ltcqtb85vmhj8kb8sruti4est3d80tg2qr9ponq6hck&scope=default-m2m-resource-server-pzhb8z/read`
+      }
+    )
+
+    const authData = await authentication.json();
+
+    const externalResponse = await fetch("https://ca1f-2806-103e-1b-2cf5-ba3a-8ff-fe5f-6891.ngrok-free.app/import", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "Authorization": `Bearer ${authData.access_token}`
       },
       body: JSON.stringify(mappedProducts),
     });
@@ -263,8 +276,8 @@ export async function fetchAndSendProducts(request: Request) {
     }
 
     return { success: true, message: `Sent ${mappedProducts.length} products successfully` };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in fetchAndSendProducts:", error);
-    return { success: false, error: error.message };
+    return { success: false, error: error?.message ?? '' };
   }
 }

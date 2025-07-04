@@ -8,13 +8,11 @@ import {
   Card,
   Button,
   BlockStack,
-  Thumbnail,
-  Spinner,
-  Popover,
+  Spinner, Thumbnail,
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge, Modal } from "@shopify/app-bridge-react";
 import { authenticate, db } from "../shopify.server";
-import { fetchAndQueueProducts  } from "../utils/shopifyProducts";
+import {fetchAndSendProducts} from "../utils/shopifyProducts";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticate.admin(request);
@@ -26,11 +24,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
-  const { admin } = await authenticate.admin(request);
-  console.log(`admin`,admin);  
-  const fetchProductsResponse = await fetchAndQueueProducts(request);
-  console.log(`\n\n\nAll Products sent successfully!`);
-  return { products: fetchProductsResponse };
+  try {
+    const { admin } = await authenticate.admin(request);
+    console.log(`admin`,admin);
+    const fetchProductsResponse = await fetchAndSendProducts(request);
+    console.log(`\n\n\nAll Products sent successfully!`);
+    return { products: fetchProductsResponse };
+  } catch (error) {
+    console.error("Error in action:", error);
+    return { error: "Failed to send products." };
+  }
 };
 
 
@@ -74,17 +77,19 @@ export default function Index() {
             <Card>
               <BlockStack gap="500">
                 <BlockStack gap="200">
-                  <Text as="h3" variant="headingMd">
-                    Get started with products
-                  </Text>
-                  <Text as="p" variant="bodyMd">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Error, harum ab. Explicabo doloribus, quibusdam in laboriosam tenetur sequi aliquam suscipit officiis alias? Debitis velit illum esse quasi nulla maxime laudantium!
-                  </Text>                  
                   <Thumbnail
                     source="/banner.avif"
                     size="large"
                     alt="Black choker necklace"
                   />
+                  <Text as="h3" variant="headingMd">
+                    Get started with products
+                  </Text>
+                  <Text as="p" variant="bodyMd">
+                    Start by syncing your Shopify store products with our platform. This allows the AI-powered search to detect, classify, and suggest your products automatically.
+                    Whenever you add or update a product, make sure to run a new sync to keep everything up to date.
+                    Ready to improve your customers’ search experience? Click the New Sync button begin.
+                  </Text>
                 </BlockStack>
               </BlockStack>
             </Card>
@@ -93,40 +98,40 @@ export default function Index() {
             <BlockStack gap="500">
               <Card>
                 <BlockStack gap="500">
-                <Text as="h3" variant="headingMd">
-                  Sync Logs
-                </Text>
-                <BlockStack gap="200">
-                  {syncLogs.length > 0 ? (
-                    syncLogs.map((log) => (
-                      <Text key={log.id} as="p" variant="bodyMd">
-                        <strong>Succeed Sync At: </strong> {new Date(log.date).toLocaleString()}
-                      </Text>
-                    ))
-                  ) : (
-                    <Text as="p">No sync logs available.</Text>
-                  )}
+                  <Text as="h3" variant="headingMd">
+                    Sync Logs
+                  </Text>
+                  <BlockStack gap="200">
+                    {syncLogs.length > 0 ? (
+                      syncLogs.map((log: any) => (
+                        <Text key={log.id} as="p" variant="bodyMd">
+                          <strong>Succeed Sync At: </strong> {new Date(log.date).toLocaleString()}
+                        </Text>
+                      ))
+                    ) : (
+                      <Text as="p">No sync logs available.</Text>
+                    )}
+                  </BlockStack>
+                  <BlockStack gap="200">
+                    <fetcher.Form method="post">
+                      {isLoading ? (
+                        <Spinner accessibilityLabel="Sending products" size="large" />
+                      ) : (
+                        <>
+                          <input type="hidden" name="actionType" value="sendProducts" />
+                          <Button submit>
+                            {syncLogs.length > 0 ? (
+                              'New Sync'
+                            ) : (
+                              'Send Products to External Provider'
+                            )}
+                          </Button>
+                        </>
+                      )}
+                    </fetcher.Form>
+                  </BlockStack>
                 </BlockStack>
-                <BlockStack gap="200">
-                <fetcher.Form method="post">
-                  {isLoading ? (
-                    <Spinner accessibilityLabel="Sending products" size="large" />
-                  ) : (
-                    <>
-                      <input type="hidden" name="actionType" value="sendProducts" />
-                      <Button submit>
-                        {syncLogs.length > 0 ? (
-                          'New Sync'
-                        ) : (
-                          'Send Products to External Provider'
-                        )}                        
-                      </Button>
-                    </>
-                  )}
-                </fetcher.Form>
-                </BlockStack>
-              </BlockStack>
-              </Card>              
+              </Card>
             </BlockStack>
           </Layout.Section>
         </Layout>
@@ -136,7 +141,7 @@ export default function Index() {
           {isLoading ? (
             <Spinner size="large" />
           ) : (
-            <Text as="b">Products Sent!</Text>
+            <Text as="strong">Products Sent!</Text>
           )}
         </div>
         <TitleBar title="Sending Products">
