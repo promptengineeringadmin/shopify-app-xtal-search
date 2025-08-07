@@ -11,10 +11,10 @@ import prisma from "./db.server";
 
 const redisClient = createClient({
   username: 'default',
-  password: 'nhlgCXIbCzIXEnMkdA0PXdRFvtlKcPfC',
+  password: 'CzH2exAi3tw86dVL70XcnnrNQsWmO9qE',
   socket: {
-      host: 'redis-17722.c80.us-east-1-2.ec2.redns.redis-cloud.com',
-      port: 17722
+      host: 'redis-12834.c90.us-east-1-3.ec2.redns.redis-cloud.com',
+      port: 12834
   }
 });
 

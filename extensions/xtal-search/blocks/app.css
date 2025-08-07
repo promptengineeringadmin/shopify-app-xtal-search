@@ -1,0 +1,90 @@
+.xtal-search-wrapper {
+  padding: 2rem;
+  font-family: sans-serif;
+}
+
+.search-bar-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.search-button {
+  background-color: #2c4fbb;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.get-started-buttons button,
+.suggested-aspects label,
+.active-aspects label,
+.refinement-controls button {
+  background: #f1f1f1;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin: 0.25rem;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.active-aspects label {
+  background-color: #2c4fbb;
+  color: white;
+}
+
+.results-heading {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+}
+
+.results-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.search-result-card {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.search-item-img-frame {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  margin-bottom: 0.5rem;
+}
+
+.search-item-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.search-item-price-container {
+  margin-top: 0.5rem;
+}
+
+.search-item-price {
+  font-weight: bold;
+}
+
+.sort-dropdown {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}

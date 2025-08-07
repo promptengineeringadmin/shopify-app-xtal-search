@@ -49,14 +49,18 @@ class SearchPage extends HTMLElement {
 
     try {
       const requestOptions = {
-        method: "GET",
+        method: "POST",
         redirect: "follow",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            query: query,
+            aspects: this.activeAspects.join(","),
+          })
       };
 
-      fetch(
-        `https://84cf-187-161-119-1.ngrok-free.app/get_aspects?query=${query}&aspects=${this.activeAspects.join(",")}`,
-        requestOptions,
-      )
+      fetch(`https://1d07ff6f26ee.ngrok-free.app/api/aspects`, requestOptions)
         .then((response) => response.json())
         .then(async (result) => {
           await this.buildAspects(result);
@@ -91,10 +95,8 @@ class SearchPage extends HTMLElement {
     myHeaders.append("Content-Type", "application/json");
 
     const raw = JSON.stringify({
-      text: this.activeAspects.join(" ") + " " + query,
+      query: query,
       limit: 25,
-      custom_prompt:
-        "Given the following short query, please expand it into a more detailed and specific form. Consider adding relevant details such as product features, intended use, or any specific attributes that might be important for a comprehensive search. Your response should maintain the intent of the original query but provide additional keywords that could help in refining search results. Assume the query is meant for an e-commerce search engine that caters to a wide variety of products.",
     });
 
     const requestOptions = {
@@ -104,17 +106,17 @@ class SearchPage extends HTMLElement {
       redirect: "follow",
     };
 
-    fetch("https://84cf-187-161-119-1.ngrok-free.app/search", requestOptions)
+    fetch("https://1d07ff6f26ee.ngrok-free.app/api/search", requestOptions)
       .then((response) => response.json())
       .then((data) => {
         resultsContainer.innerHTML = "";
 
-        for (const item of data.results.vector_results) {
+        for (const item of data.results) {
           const searchResultCard = document.createElement("div");
           searchResultCard.classList.add("search-result-card");
 
           const searchLink = document.createElement("a");
-          searchLink.href = `/products/${item.product_url}`;
+          searchLink.href = item.product_url
           searchLink.classList.add("search-link");
 
           const imgFrame = document.createElement("div");

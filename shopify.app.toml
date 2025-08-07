@@ -3,7 +3,7 @@
 client_id = "c67a0bc1c47c55e34518902017fc99d1"
 name = "Xtal-Search-AI"
 handle = "xtal-search-ai"
-application_url = "https://carriers-let-nancy-based.trycloudflare.com"
+application_url = "https://trusts-benefits-administrators-madrid.trycloudflare.com"
 embedded = true
 
 [build]
@@ -18,11 +18,7 @@ api_version = "2025-04"
 scopes = "write_products,write_script_tags"
 
 [auth]
-redirect_urls = [
-  "https://carriers-let-nancy-based.trycloudflare.com/auth/callback",
-  "https://carriers-let-nancy-based.trycloudflare.com/auth/shopify/callback",
-  "https://carriers-let-nancy-based.trycloudflare.com/api/auth/callback"
-]
+redirect_urls = ["https://trusts-benefits-administrators-madrid.trycloudflare.com/auth/callback", "https://trusts-benefits-administrators-madrid.trycloudflare.com/auth/shopify/callback", "https://trusts-benefits-administrators-madrid.trycloudflare.com/api/auth/callback"]
 
 [pos]
 embedded = false

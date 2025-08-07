@@ -1,136 +1,48 @@
-<div class="search-container-wrap">
+<div class="xtal-search-wrapper">
   <search-page limit="{{ section.settings.max_products }}">
-    <div class="search-container">
-        <input type="text" class="search-input" placeholder="Search..." />
+    <div class="search-header">
+      <div class="search-bar-container">
+        <input class="search-input" type="text" placeholder="Find your product" />
         <button class="search-button">Search</button>
-    </div>
-    <div class="aspects-containers">
-      <div id="active-aspects-container"></div>
-      <div id="aspects-container"></div>
-    </div>
-    <div class="results-container"></div>
-  </search-page>
+      </div>
 
+      <div class="aspects-containers">
+        <div id="active-aspects-container"></div>
+        <div id="aspects-container"></div>
+      </div>
+    </div>
+
+    <div class="popular-searches">
+      <div class="aspects-title">Popular Searches</div>
+      <div id="active-aspects-container" class="active-aspects"></div>
+      <div id="aspects-container" class="suggested-aspects"></div>
+    </div>
+
+    <div class="refinements hidden">
+      <div class="refinement-controls">
+        <button>Men's & Women's</button>
+        <button>All colors</button>
+        <button>View all filters</button>
+      </div>
+      <div class="sort-dropdown">
+        <label for="sort-select">Sort by</label>
+        <select id="sort-select">
+          <option value="featured">Featured</option>
+          <option value="price_asc">Price (Low to High)</option>
+          <option value="price_desc">Price (High to Low)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="results-section">
+      <h2 class="results-heading">Popular Items</h2>
+      <div class="results-container"></div>
+    </div>
+  </search-page>
 </div>
 
-<style>
-  search-page {
-    display: flex;
-    margin: 20px auto;
-    font-family: Arial, sans-serif;
-    flex-direction: column;
-    align-items: center;
-    min-height: 100vh;
-  }
-  .search-container {
-    display: flex;
-    gap: 10px;
-    max-width: 600px;
-    width: 100%;
-  }
-  .aspects-containers {
-    display: flex;
-    width: 100%;
-    gap: 1rem;
-    margin: 1rem 0;
-    flex-direction: column;
-  }
-  #aspects-container, #active-aspects-container {
-    display: flex;
-    width: 100%;
-    gap: 1rem;
-  }
-  .aspects-containers label {
-    cursor: pointer;
-    border: 1px solid gray;
-    padding: .5rem 1rem;
-    border-radius: 1rem;
-    display: flex;
-    transition: all;
-    align-items: center;
-    max-height: fit-content;
-    min-width: fit-content;
-  }
-  .aspects-containers label:hover {
-    background-color: #80bbff;
-    color: #FFF;
-  }
-
-  #active-aspects-container label {
-    background-color: #0978f6;
-    color: #FFF;
-  }
-
-  .search-input {
-    flex-grow: 1;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  .search-button {
-    padding: 8px 12px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .results-container {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .search-result-card {
-    display: flex;
-  }
-
-  a.search-link {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    text-decoration: none;
-    padding: 1rem;
-  }
-
-  a.search-link h3 {
-    display: flex;
-    width: 100%;
-  }
-
-  a.search-link .search-item-price-container {
-    
-  }
-
-  a.search-link .search-item-price-container .search-item-price{
-    color: rgb(var(--color-foreground));
-  }
-
-  .search-item-img-frame{
-    display: flex;
-    width: 100%;
-    position: relative;
-    overflow: hidden;
-    aspect-ratio: 1;
-  }
-
-  .search-item-img {
-    position: absolute;
-    width: 100%;
-  }
-
-  .search-result{
-    display: flex;
-  }
-  .search-link{
-    display: flex;
-    flex-direction: column;
-  }
-
-</style>
+{{ 'app.js' | asset_url | script_tag }}
+{{ 'app.css' | asset_url | stylesheet_tag }}
 
 {% schema %}
 {

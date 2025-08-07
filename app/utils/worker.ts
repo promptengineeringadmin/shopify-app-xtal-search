@@ -6,7 +6,7 @@ const worker = new Worker(
   async (job) => {
     console.log(`Processing job ${job.id}: Sending ${job.data.products.length} products`);
 
-    const response = await fetch("https://41de-187-161-119-1.ngrok-free.app/import", {
+    const response = await fetch("https://1d07ff6f26ee.ngrok-free.app/api/import", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(job.data.products),

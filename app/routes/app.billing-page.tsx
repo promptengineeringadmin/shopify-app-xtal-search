@@ -1,16 +1,12 @@
 import {
   Box,
   Card,
-  Layout,
-  Link,
-  List,
   Page,
   Button,
   Text,
   ProgressBar,
   InlineStack,
   BlockStack,
-  IndexTable,
 } from "@shopify/polaris";
 import {
   ChatIcon,
@@ -45,7 +41,7 @@ export default function BillingPage() {
               </BlockStack>
             </BlockStack>
           </Card>
-          
+
           <Card>
             <BlockStack gap="500">
               <BlockStack gap="100">
@@ -55,7 +51,7 @@ export default function BillingPage() {
 
             </BlockStack>
           </Card>
-          
+
           <Card>
             <BlockStack gap="300">
               <InlineStack  align="space-between">

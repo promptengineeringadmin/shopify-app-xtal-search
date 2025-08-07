@@ -260,7 +260,7 @@ export async function fetchAndSendProducts(request: Request) {
 
     const authData = await authentication.json();
 
-    const externalResponse = await fetch("https://ca1f-2806-103e-1b-2cf5-ba3a-8ff-fe5f-6891.ngrok-free.app/import", {
+    const externalResponse = await fetch("https://1d07ff6f26ee.ngrok-free.app/api/import", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
