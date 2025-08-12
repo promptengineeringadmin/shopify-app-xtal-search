@@ -3,9 +3,10 @@ class SearchPage extends HTMLElement {
     super();
     this.limit = this.getAttribute("limit") || 25;
     this.aspectsContainer = this.querySelector(`#aspects-container`);
-    this.activeAspectsContainer = this.querySelector(
-      `#active-aspects-container`,
-    );
+    this.activeAspectsContainer = this.querySelector(`#active-aspects-container`);
+    this.resultsHeading = this.querySelector(".results-heading");
+    this.searchInput = this.querySelector(".search-input");
+    this.resultsContainer = this.querySelector(".results-container");
     this.activeAspects = [];
     this.toSelectAspects = [];
   }
@@ -20,32 +21,43 @@ class SearchPage extends HTMLElement {
   }
 
   async connectedCallback() {
-   this.activeAspectsContainer.addEventListener("keypress", (e) => {
-     if (e.key === "Enter") {
-      this.buildSearch();
-     }
-   });
-   this.querySelector(".search-button").addEventListener("click", () =>
-     this.buildSearch(),
-   );
-   const params = new URLSearchParams(window.location.search);
-   const query = params.get('q');
-   if (query) {
-    this.querySelector(".search-input").value = query;
-    await this.buildSearch();
-   }
+    // Escuchar Enter o botón "Search"
+    this.activeAspectsContainer.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") this.buildSearch();
+    });
+    this.querySelector(".search-button").addEventListener("click", () => this.buildSearch());
+
+    // Botones de sugerencias como "I'm going on a trip"
+    const buttons = this.querySelectorAll(".get-started-buttons button");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const query = btn.textContent.trim();
+        this.searchInput.value = query;
+        this.buildSearch();
+      });
+    });
+
+    // Si hay ?q= en la URL, buscarlo; si no, mostrar populares
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    if (query) {
+      this.searchInput.value = query;
+      await this.buildSearch();
+    } else {
+      this.showPopularItems(); // Estado inicial
+    }
   }
 
   async buildSearch() {
-    const query = this.querySelector(".search-input").value;
+    const query = this.searchInput.value;
     if (!query) return;
 
     const url = new URL(window.location.href);
     url.searchParams.set('q', query);
     window.history.replaceState({}, '', url);
 
-    const resultsContainer = this.querySelector(".results-container");
-    resultsContainer.innerHTML = "Searching...";
+    this.resultsContainer.innerHTML = "Searching...";
+    this.resultsHeading.textContent = "Searching...";
 
     try {
       const requestOptions = {
@@ -55,21 +67,19 @@ class SearchPage extends HTMLElement {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            query: query,
-            aspects: this.activeAspects.join(","),
-          })
+          query: query,
+          aspects: this.activeAspects.join(","),
+        }),
       };
 
-      fetch(`https://1d07ff6f26ee.ngrok-free.app/api/aspects`, requestOptions)
-        .then((response) => response.json())
-        .then(async (result) => {
-          await this.buildAspects(result);
-          await this.search();
-        })
-        .catch((error) => console.error(error));
+      const response = await fetch(`https://1d07ff6f26ee.ngrok-free.app/api/aspects`, requestOptions);
+      const result = await response.json();
+
+      await this.buildAspects(result);
+      await this.search();
     } catch (error) {
       console.error(error);
-      resultsContainer.innerHTML = "Error fetching results.";
+      this.resultsContainer.innerHTML = "Error fetching results.";
     }
   }
 
@@ -87,10 +97,9 @@ class SearchPage extends HTMLElement {
   }
 
   async search() {
-    const query = this.querySelector(".search-input").value;
+    const query = this.searchInput.value;
     if (!query) return;
 
-    const resultsContainer = this.querySelector(".results-container");
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -106,63 +115,65 @@ class SearchPage extends HTMLElement {
       redirect: "follow",
     };
 
-    fetch("https://1d07ff6f26ee.ngrok-free.app/api/search", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        resultsContainer.innerHTML = "";
+    try {
+      const response = await fetch("https://1d07ff6f26ee.ngrok-free.app/api/search", requestOptions);
+      const data = await response.json();
 
-        for (const item of data.results) {
-          const searchResultCard = document.createElement("div");
-          searchResultCard.classList.add("search-result-card");
+      this.resultsContainer.innerHTML = "";
 
-          const searchLink = document.createElement("a");
-          searchLink.href = item.product_url
-          searchLink.classList.add("search-link");
+      if (!data.results?.length) {
+        this.resultsHeading.textContent = `No results for "${query}"`;
+        this.resultsContainer.innerHTML = `<p>No items found. Try something else.</p>`;
+        return;
+      }
 
-          const imgFrame = document.createElement("div");
-          imgFrame.classList.add("search-item-img-frame");
+      this.resultsHeading.textContent = `Here’s what we found for you (${data.results.length} items):`;
 
-          const img = document.createElement("img");
-          img.src = item.image_url;
-          img.alt = item.name;
-          img.classList.add("search-item-img");
-          img.loading = "lazy";
+      for (const item of data.results) {
+        const searchResultCard = document.createElement("div");
+        searchResultCard.classList.add("search-result-card");
 
-          imgFrame.appendChild(img);
+        const searchLink = document.createElement("a");
+        searchLink.href = item.product_url;
+        searchLink.classList.add("search-link");
 
-          const title = document.createElement("h3");
-          title.textContent = item.name;
+        const imgFrame = document.createElement("div");
+        imgFrame.classList.add("search-item-img-frame");
 
-          const priceContainer = document.createElement("div");
-          priceContainer.classList.add("search-item-price-container");
+        const img = document.createElement("img");
+        img.src = item.image_url;
+        img.alt = item.name;
+        img.classList.add("search-item-img");
+        img.loading = "lazy";
 
-          // Create price span
-          const priceSpan = document.createElement("span");
-          priceSpan.classList.add("search-item-price");
-          priceSpan.textContent = this.itemMoneyFormat(item.price);
+        imgFrame.appendChild(img);
 
-          // Append priceSpan to priceContainer
-          priceContainer.appendChild(priceSpan);
+        const title = document.createElement("h5");
+        title.textContent = item.name;
 
-          // Append all elements to searchLink
-          searchLink.appendChild(imgFrame);
-          searchLink.appendChild(title);
-          searchLink.appendChild(priceContainer);
+        const priceContainer = document.createElement("div");
+        priceContainer.classList.add("search-item-price-container");
 
-          // Append searchLink to searchResultCard
-          searchResultCard.appendChild(searchLink);
+        const priceSpan = document.createElement("span");
+        priceSpan.classList.add("search-item-price");
+        priceSpan.textContent = this.itemMoneyFormat(item.price);
 
-          resultsContainer.appendChild(searchResultCard);
-        }
-      })
-      .catch((error) => console.error(error));
+        priceContainer.appendChild(priceSpan);
+        searchLink.appendChild(imgFrame);
+        searchLink.appendChild(title);
+        searchLink.appendChild(priceContainer);
+        searchResultCard.appendChild(searchLink);
+        this.resultsContainer.appendChild(searchResultCard);
+      }
+    } catch (error) {
+      console.error(error);
+      this.resultsContainer.innerHTML = "Error loading results.";
+    }
   }
 
   async readAspects() {
-    const activeAspects = this.activeAspects;
-
     this.activeAspectsContainer.innerHTML = "";
-    for (const aspect of activeAspects) {
+    for (const aspect of this.activeAspects) {
       const label = document.createElement(`label`);
       label.classList.add("active");
       label.setAttribute("aspect", aspect);
@@ -170,24 +181,14 @@ class SearchPage extends HTMLElement {
       label.addEventListener("click", (event) => this.removeAspect(event));
       this.activeAspectsContainer.appendChild(label);
     }
-
     await this.buildSearch();
   }
 
   async removeAspect(event) {
     const label = event.target;
     const aspect = label.getAttribute("aspect");
-
-    console.log(`this.activeAspects`);
-    console.log(this.activeAspects);
-
     this.activeAspects = this.activeAspects.filter((item) => item !== aspect);
-
-    console.log(`this.activeAspects`);
-    console.log(this.activeAspects);
-
     await this.readAspects();
-    await this.buildSearch();
   }
 
   async addAspect(event) {
@@ -195,6 +196,11 @@ class SearchPage extends HTMLElement {
     const aspect = label.getAttribute("aspect");
     this.activeAspects.push(aspect);
     this.readAspects();
+  }
+
+  async showPopularItems() {
+    this.resultsHeading.textContent = "Popular Items";
+    this.resultsContainer.innerHTML = `<p>Use the search bar or try one of the suggestions above.</p>`;
   }
 }
 
