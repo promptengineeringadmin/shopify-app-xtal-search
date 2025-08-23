@@ -72,7 +72,7 @@ class SearchPage extends HTMLElement {
         }),
       };
 
-      const response = await fetch(`https://1d07ff6f26ee.ngrok-free.app/api/aspects`, requestOptions);
+      const response = await fetch(`https://d37ia7ubfgdimd.cloudfront.net/api/aspects`, requestOptions);
       const result = await response.json();
 
       await this.buildAspects(result);
@@ -116,7 +116,7 @@ class SearchPage extends HTMLElement {
     };
 
     try {
-      const response = await fetch("https://1d07ff6f26ee.ngrok-free.app/api/search", requestOptions);
+      const response = await fetch("https://d37ia7ubfgdimd.cloudfront.net/api/search", requestOptions);
       const data = await response.json();
 
       this.resultsContainer.innerHTML = "";
